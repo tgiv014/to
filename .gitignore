@@ -1,0 +1,5 @@
+/*.yaml
+node_modules/
+.task
+*.exe
+*.db

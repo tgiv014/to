@@ -1,0 +1,31 @@
+# https://taskfile.dev
+
+version: '3'
+
+interval: 500ms
+
+tasks:
+  default:
+    deps: [ build ]
+  generate:
+    cmds:
+      - go generate ./...
+    sources:
+      - '**/*.templ'
+    generates:
+      - '**/*_templ.go'
+  tailwind:
+    cmds:
+      - npx tailwindcss -i ./assets/tailwind.css -o ./assets/dist/tailwind.css
+    sources:
+      - '**/*.templ'
+  build:
+    deps: [ generate, tailwind ]
+    cmds:
+      - go build cmd/server/main.go
+    sources:
+      - '**/*.go'
+  dev:
+    deps: [ build ]
+    watch: true
+    cmd: ./main

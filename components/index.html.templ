@@ -1,0 +1,30 @@
+package components
+
+templ head() {
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link href="/static/tailwind.css" rel="stylesheet"/>
+        <script src="/static/htmx.min.js"></script>
+    </head>
+}
+
+templ Index() {
+    <html>
+        @head()
+    </html>
+    <body class="bg-gray-100" hx-boost="true">
+        <div class="flex items-center justify-center flex-col min-h-screen">
+            <div class="card w-96 bg-base-100">
+                <div class="card-body">
+                    <h3>Create</h3>
+                    <form action="/links" method="post">
+                        <input id="path" name="path" type="text" placeholder="Path"/>
+                        <input id="url" name="url" type="text" placeholder="URL"/>
+                        <button type="submit">Create Link</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+}
