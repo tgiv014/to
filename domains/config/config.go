@@ -12,9 +12,10 @@ import (
 var defaultConfigBytes []byte
 
 type Config struct {
-	Hostname   string
-	AuthKey    string
+	Hostname   string `mapstructure:"hostname"`
+	AuthKey    string `mapstructure:"auth_key"`
 	DBPath     string `mapstructure:"db_path"`
+	DataPath   string `mapstructure:"data_path"`
 	ConfigPath string `mapstructure:"-"`
 }
 

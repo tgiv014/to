@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/charmbracelet/log"
 	"github.com/tgiv014/to/app"
-	"github.com/tgiv014/to/config"
+	"github.com/tgiv014/to/domains/config"
 )
 
 func main() {

@@ -1,2 +1,3 @@
 hostname: "to"
 db_path: "./data/sqlite.db"
+data_path: "./data"

@@ -14,7 +14,7 @@ type LinkHandler struct {
 
 func NewLinkHandler(links *link.Service) *LinkHandler {
 	return &LinkHandler{
-		links,
+		links: links,
 	}
 }
 
