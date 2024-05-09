@@ -35,7 +35,7 @@ tasks:
       - generate
       - tailwind
     cmds:
-      - go build cmd/server/main.go
+      - CGO_ENABLED=0 go build -o to cmd/server/main.go
     sources:
       - "**/*.go"
       - "assets/dist/tailwind.css"
@@ -43,4 +43,4 @@ tasks:
     deps:
       - build
     watch: true
-    cmd: ./main
+    cmd: ./to

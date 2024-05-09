@@ -1,2 +1,2 @@
 hostname: "to"
-db_path: "./to.db"
+db_path: "./data/sqlite.db"

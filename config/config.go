@@ -12,9 +12,10 @@ import (
 var defaultConfigBytes []byte
 
 type Config struct {
-	Hostname string
-	AuthKey  string
-	DBPath   string `mapstructure:"db_path"`
+	Hostname   string
+	AuthKey    string
+	DBPath     string `mapstructure:"db_path"`
+	ConfigPath string `mapstructure:"-"`
 }
 
 func LoadConfig() (Config, error) {
@@ -22,6 +23,7 @@ func LoadConfig() (Config, error) {
 	v.SetConfigName("config")
 	v.SetConfigType("yaml")
 	v.AddConfigPath(".")
+	v.AddConfigPath("./data")
 
 	reader := bytes.NewReader(defaultConfigBytes)
 	err := v.ReadConfig(reader)
@@ -39,6 +41,7 @@ func LoadConfig() (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
+	config.ConfigPath = v.ConfigFileUsed()
 
 	return config, nil
 }

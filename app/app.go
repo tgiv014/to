@@ -21,7 +21,7 @@ func NewApp(cfg config.Config) *App {
 }
 
 func (a *App) Run() error {
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(a.cfg.DBPath), &gorm.Config{})
 	if err != nil {
 		return err
 	}
