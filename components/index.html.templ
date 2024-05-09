@@ -1,30 +1,34 @@
 package components
 
 templ head() {
-    <head>
-        <meta charset="UTF-8"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <link href="/static/tailwind.css" rel="stylesheet"/>
-        <script src="/static/htmx.min.js"></script>
-    </head>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<link href="/static/tailwind.css" rel="stylesheet"/>
+		<script src="/static/htmx.min.js"></script>
+	</head>
 }
 
 templ Index() {
-    <html>
-        @head()
-    </html>
-    <body class="bg-gray-100" hx-boost="true">
-        <div class="flex items-center justify-center flex-col min-h-screen">
-            <div class="card w-96 bg-base-100">
-                <div class="card-body">
-                    <h3>Create</h3>
-                    <form action="/links" method="post">
-                        <input id="path" name="path" type="text" placeholder="Path"/>
-                        <input id="url" name="url" type="text" placeholder="URL"/>
-                        <button type="submit">Create Link</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </body>
+	<html>
+		@head()
+	</html>
+	<body class="bg-base-300" hx-boost="true">
+		<div class="flex items-center justify-center flex-col min-h-screen">
+			<div class="card w-96 bg-base-100 shadow-xl">
+				<div class="card-body">
+					<h2 class="card-title">Create a Link</h2>
+					<div class="card-actions">
+						<form action="/links" method="post" class="w-full">
+							<div class="flex flex-col gap-2 w-full">
+								<input type="text" id="path" name="path" placeholder="Path" class="input input-bordered w-full"/>
+								<input type="text" id="url" name="url" placeholder="URL" class="input input-bordered w-full"/>
+								<button type="submit" class="btn btn-primary btn-block">Create Link</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
 }

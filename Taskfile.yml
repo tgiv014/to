@@ -1,31 +1,46 @@
 # https://taskfile.dev
 
-version: '3'
+version: "3"
 
 interval: 500ms
 
 tasks:
   default:
-    deps: [ build ]
+    deps:
+      - build
+  deps:
+    cmds:
+      - npm install
+    sources:
+      - package.json
+      - package-lock.json
   generate:
     cmds:
       - go generate ./...
     sources:
-      - '**/*.templ'
+      - "**/*.html.templ"
     generates:
-      - '**/*_templ.go'
+      - "**/*.html_templ.go"
   tailwind:
     cmds:
       - npx tailwindcss -i ./assets/tailwind.css -o ./assets/dist/tailwind.css
     sources:
-      - '**/*.templ'
+      - "**/*.html.templ"
+    generates:
+      - "assets/dist/tailwind.css"
+    deps:
+      - deps
   build:
-    deps: [ generate, tailwind ]
+    deps:
+      - generate
+      - tailwind
     cmds:
       - go build cmd/server/main.go
     sources:
-      - '**/*.go'
+      - "**/*.go"
+      - "assets/dist/tailwind.css"
   dev:
-    deps: [ build ]
+    deps:
+      - build
     watch: true
     cmd: ./main

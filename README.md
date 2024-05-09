@@ -1,8 +1,8 @@
-# to
+# `to/`
 
-`to` is a homelab-centric shortlink service similar to `golink`.
+`to/` is a homelab-centric shortlink service similar to `go/link`s.
 
-## stack
+## Stack
 
 - Go
 - Gin
@@ -10,3 +10,8 @@
 - templ
 - tailwind
 - daisyui
+
+## Dependencies
+
+- `go install github.com/go-task/task/v3/cmd/task@latest`
+- `go install github.com/a-h/templ/cmd/templ@latest`
