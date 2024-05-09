@@ -7,6 +7,7 @@ import (
 	"github.com/tgiv014/to/handlers"
 )
 
+// Router returns a new gin router
 func (a *App) Router() *gin.Engine {
 	linkHandler := handlers.NewLinkHandler(a.links)
 
