@@ -4,21 +4,40 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/tgiv014/to/components"
 	"github.com/tgiv014/to/domains/link"
-	"gorm.io/gorm"
 )
 
 type LinkHandler struct {
-	db *gorm.DB
+	links *link.Service
 }
 
-func NewLinkHandler(db *gorm.DB) *LinkHandler {
+func NewLinkHandler(links *link.Service) *LinkHandler {
 	return &LinkHandler{
-		db,
+		links,
 	}
 }
 
-func (l *LinkHandler) Get(c *gin.Context) {
+func (l *LinkHandler) Index(c *gin.Context) {
+	links, err := l.links.GetAll()
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	components.Index(links).Render(c, c.Writer)
+}
+
+func (l *LinkHandler) Follow(c *gin.Context) {
+	path := c.Param("path")
+
+	link, err := l.links.GetByPath(path)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.Redirect(http.StatusSeeOther, link.URL)
 }
 
 func (l *LinkHandler) Create(c *gin.Context) {
@@ -35,10 +54,32 @@ func (l *LinkHandler) Create(c *gin.Context) {
 		return
 	}
 
-	l.db.Create(&link.Link{
+	err := l.links.Create(&link.Link{
 		Path: path,
 		URL:  url,
 	})
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.Redirect(http.StatusSeeOther, "/")
+}
+
+func (l *LinkHandler) Delete(c *gin.Context) {
+	path := c.Param("path")
+
+	link, err := l.links.GetByPath(path)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	err = l.links.Delete(link)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
 
 	c.Redirect(http.StatusSeeOther, "/")
 }

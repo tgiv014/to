@@ -1,5 +1,9 @@
 package components
 
+import (
+	"github.com/tgiv014/to/domains/link"
+)
+
 templ head() {
 	<head>
 		<meta charset="UTF-8"/>
@@ -9,26 +13,44 @@ templ head() {
 	</head>
 }
 
-templ Index() {
+templ create_link_card() {
+	<div class="card w-96 bg-base-100 shadow-xl">
+		<div class="card-body">
+			<h2 class="card-title text-3xl">Create a Link</h2>
+			<div class="card-actions">
+				<form action="/links" method="post" class="w-full">
+					<div class="flex flex-col gap-2 w-full">
+						<input type="text" id="path" name="path" placeholder="Path" class="input input-bordered w-full"/>
+						<input type="text" id="url" name="url" placeholder="URL" class="input input-bordered w-full"/>
+						<button type="submit" class="btn btn-primary btn-block">Create Link</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+}
+
+templ Index(links []link.Link) {
 	<html>
 		@head()
 	</html>
 	<body class="bg-base-300" hx-boost="true">
 		<div class="flex items-center justify-center flex-col min-h-screen">
-			<div class="card w-96 bg-base-100 shadow-xl">
-				<div class="card-body">
-					<h2 class="card-title">Create a Link</h2>
-					<div class="card-actions">
-						<form action="/links" method="post" class="w-full">
-							<div class="flex flex-col gap-2 w-full">
-								<input type="text" id="path" name="path" placeholder="Path" class="input input-bordered w-full"/>
-								<input type="text" id="url" name="url" placeholder="URL" class="input input-bordered w-full"/>
-								<button type="submit" class="btn btn-primary btn-block">Create Link</button>
-							</div>
-						</form>
+			@create_link_card()
+			for _, link := range links {
+				<div class="card w-96 bg-base-100 shadow-xl">
+					<div class="card-body">
+						<h3 class="card-title text-xl">{ link.Path } </h3>
+						<p><i>{ link.URL }</i></p>
+						<div class="card-actions">
+							<a href={ templ.URL(link.URL) } class="btn btn-primary">Go</a>
+							<form action={ templ.URL("/links/" + link.Path) } method="delete" class="inline">
+								<button type="submit" class="btn btn-secondary">Delete</button>
+							</form>
+						</div>
 					</div>
 				</div>
-			</div>
+			}
 		</div>
 	</body>
 }

@@ -1,7 +1,6 @@
 package app
 
 import (
-	"github.com/charmbracelet/log"
 	"github.com/glebarez/sqlite"
 	"github.com/tgiv014/to/config"
 	"github.com/tgiv014/to/domains/link"
@@ -11,7 +10,8 @@ import (
 type App struct {
 	cfg config.Config
 
-	db *gorm.DB
+	db    *gorm.DB
+	links *link.Service
 }
 
 func NewApp(cfg config.Config) *App {
@@ -25,10 +25,13 @@ func (a *App) Run() error {
 	if err != nil {
 		return err
 	}
-	a.db = db
 
+	// Persistence
+	a.db = db
 	a.db.AutoMigrate(&link.Link{})
 
-	log.Info("Serving")
+	// Services
+	a.links = link.NewService(a.db)
+
 	return a.Router().Run()
 }

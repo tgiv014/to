@@ -8,15 +8,18 @@ import (
 )
 
 func (a *App) Router() *gin.Engine {
+	linkHandler := handlers.NewLinkHandler(a.links)
+
 	router := gin.Default()
 	router.StaticFS("/static", static.EmbedFolder(assets.Assets, "dist"))
-	router.GET("/", handlers.IndexHandler{}.Index)
+	router.GET("/", linkHandler.Index)
+	router.GET("/:path", linkHandler.Follow)
 
 	links := router.Group("links")
 	{
-		linkHandler := handlers.NewLinkHandler(a.db)
-		links.GET("/", linkHandler.Get)
+		// links.GET("/", linkHandler.Get)
 		links.POST("/", linkHandler.Create)
+		links.DELETE("/:path", linkHandler.Delete)
 	}
 
 	return router
