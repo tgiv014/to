@@ -3,9 +3,11 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/charmbracelet/log"
 	"github.com/gin-gonic/gin"
 	"github.com/tgiv014/to/components"
 	"github.com/tgiv014/to/domains/link"
+	"github.com/tgiv014/to/middleware"
 )
 
 type LinkHandler struct {
@@ -19,6 +21,9 @@ func NewLinkHandler(links *link.Service) *LinkHandler {
 }
 
 func (l *LinkHandler) Index(c *gin.Context) {
+	user := middleware.GetUserProfile(c)
+	log.Info("user", user)
+
 	links, err := l.links.GetAll()
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
