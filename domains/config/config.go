@@ -26,6 +26,11 @@ func LoadConfig() (Config, error) {
 	v.AddConfigPath(".")
 	v.AddConfigPath("./data")
 
+	v.BindEnv("hostname", "TO_HOSTNAME")
+	v.BindEnv("auth_key", "TO_AUTH_KEY")
+	v.BindEnv("db_path", "TO_DB_PATH")
+	v.BindEnv("data_path", "TO_DATA_PATH")
+
 	reader := bytes.NewReader(defaultConfigBytes)
 	err := v.ReadConfig(reader)
 	if err != nil {
