@@ -37,7 +37,6 @@ func (s *Service) Listen() (net.Listener, error) {
 		Dir:     s.dataDir,
 		Logf:    func(format string, args ...any) {},
 	}
-	defer ts.Close()
 
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
@@ -58,7 +57,7 @@ func (s *Service) Listen() (net.Listener, error) {
 		return nil, err
 	}
 
-	return ln, nil
+	return wrappedListener{ln, &ts}, nil
 }
 
 func (s *Service) Identify(c *gin.Context) (identity.User, error) {
