@@ -16,6 +16,7 @@ type Config struct {
 	AuthKey    string `mapstructure:"auth_key"`
 	DBPath     string `mapstructure:"db_path"`
 	DataPath   string `mapstructure:"data_path"`
+	LocalPort  int    `mapstructure:"local_port"`
 	ConfigPath string `mapstructure:"-"`
 }
 
@@ -30,6 +31,7 @@ func LoadConfig() (Config, error) {
 	v.BindEnv("auth_key", "TO_AUTH_KEY")
 	v.BindEnv("db_path", "TO_DB_PATH")
 	v.BindEnv("data_path", "TO_DATA_PATH")
+	v.BindEnv("local_port", "TO_LOCAL_PORT")
 
 	reader := bytes.NewReader(defaultConfigBytes)
 	err := v.ReadConfig(reader)

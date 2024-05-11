@@ -21,7 +21,7 @@ func NewLinkHandler(links *link.Service) *LinkHandler {
 }
 
 func (l *LinkHandler) Index(c *gin.Context) {
-	user := middleware.GetUserProfile(c)
+	user := middleware.GetUser(c)
 	log.Info("user", user)
 
 	links, err := l.links.GetAll()

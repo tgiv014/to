@@ -1,24 +1,22 @@
 package app
 
 import (
-	"context"
-	"errors"
-	"time"
-
 	"github.com/glebarez/sqlite"
 	"github.com/tgiv014/to/domains/config"
+	"github.com/tgiv014/to/domains/identity"
 	"github.com/tgiv014/to/domains/link"
+	"github.com/tgiv014/to/domains/network"
+	"github.com/tgiv014/to/domains/tailscale"
 	"gorm.io/gorm"
-	"tailscale.com/client/tailscale"
-	"tailscale.com/tsnet"
 )
 
 type App struct {
 	cfg config.Config
 
-	lc    *tailscale.LocalClient
-	db    *gorm.DB
-	links *link.Service
+	netProvider network.Provider
+	identifier  identity.Identifier
+	db          *gorm.DB
+	links       *link.Service
 }
 
 func NewApp(cfg config.Config) *App {
@@ -28,42 +26,25 @@ func NewApp(cfg config.Config) *App {
 }
 
 func (a *App) Run() error {
+	if a.cfg.LocalPort != 0 {
+		provider := network.NewLocalProvider(a.cfg.LocalPort)
+		a.netProvider = provider
+		a.identifier = provider
+	} else {
+		ts := tailscale.NewService(a.cfg.AuthKey, a.cfg.DataPath)
+		a.netProvider = ts
+		a.identifier = ts
+	}
+
+	ln, err := a.netProvider.Listen()
+	if err != nil {
+		return err
+	}
+
 	db, err := gorm.Open(sqlite.Open(a.cfg.DBPath), &gorm.Config{})
 	if err != nil {
 		return err
 	}
-
-	if a.cfg.AuthKey == "" {
-		return errors.New("auth key is required")
-	}
-
-	ts := tsnet.Server{
-		AuthKey: a.cfg.AuthKey,
-		Dir:     a.cfg.DataPath,
-		Logf:    func(format string, args ...any) {},
-	}
-	defer ts.Close()
-
-	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
-	defer cancel()
-
-	_, err = ts.Up(ctx)
-	if err != nil {
-		return err
-	}
-
-	ln, err := ts.Listen("tcp", ":80")
-	if err != nil {
-		return err
-	}
-	defer ln.Close()
-
-	lc, err := ts.LocalClient()
-	if err != nil {
-		return err
-	}
-	a.lc = lc
 
 	// Persistence
 	a.db = db

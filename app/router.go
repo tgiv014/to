@@ -13,7 +13,7 @@ func (a *App) Router() *gin.Engine {
 	linkHandler := handlers.NewLinkHandler(a.links)
 
 	router := gin.Default()
-	router.Use(middleware.Tailscale(a.lc))
+	router.Use(middleware.Identity(a.identifier))
 	router.StaticFS("/static", static.EmbedFolder(assets.Assets, "dist"))
 	router.GET("/", linkHandler.Index)
 	router.GET("/:path", linkHandler.Follow)
