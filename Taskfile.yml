@@ -6,22 +6,19 @@ interval: 500ms
 
 tasks:
   default:
-    deps:
-      - build
-  deps:
+    desc: Lists tasks
+    cmd: task -a
+
+  install-dependencies:
+    desc: Installs npm dependencies
     cmds:
       - npm install
     sources:
       - package.json
       - package-lock.json
-  generate:
-    cmds:
-      - go generate ./...
-    sources:
-      - "**/*.html.templ"
-    generates:
-      - "**/*.html_templ.go"
+
   tailwind:
+    desc: Builds tailwind css
     cmds:
       - npx tailwindcss -i ./assets/tailwind.css -o ./assets/dist/tailwind.css
     sources:
@@ -29,18 +26,34 @@ tasks:
     generates:
       - "assets/dist/tailwind.css"
     deps:
-      - deps
+      - install-dependencies
+
+  generate:
+    desc: Generates templ Go files
+    cmds:
+      - go generate ./...
+    sources:
+      - "**/*.html.templ"
+    generates:
+      - "**/*.html_templ.go"
+
   build:
+    desc: Builds the to Go binary
     deps:
       - generate
       - tailwind
     cmds:
-      - CGO_ENABLED=0 go build -o to cmd/server/main.go
+      - CGO_ENABLED=0 go build -o to{{exeExt}} cmd/server/main.go
     sources:
       - "**/*.go"
       - "assets/dist/tailwind.css"
+    generates:
+      - "to{{exeExt}}"
+
   dev:
+    desc: Runs the to binary, rebuilding and restarting when sources are updated
     deps:
       - build
     watch: true
-    cmd: ./to
+    cmds:
+      - "to{{exeExt}}"
