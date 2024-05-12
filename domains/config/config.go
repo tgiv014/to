@@ -17,6 +17,7 @@ type Config struct {
 	DBPath     string `mapstructure:"db_path"`
 	DataPath   string `mapstructure:"data_path"`
 	LocalPort  int    `mapstructure:"local_port"`
+	LiveReload bool   `mapstructure:"live_reload"`
 	ConfigPath string `mapstructure:"-"`
 }
 

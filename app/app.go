@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/glebarez/sqlite"
+	"github.com/tgiv014/to/components"
 	"github.com/tgiv014/to/domains/config"
 	"github.com/tgiv014/to/domains/identity"
 	"github.com/tgiv014/to/domains/link"
@@ -34,6 +35,10 @@ func (a *App) Run() error {
 		ts := tailscale.NewService(a.cfg.AuthKey, a.cfg.DataPath)
 		a.netProvider = ts
 		a.identifier = ts
+	}
+
+	if a.cfg.LiveReload {
+		components.EnableLiveReload = true
 	}
 
 	ln, err := a.netProvider.Listen()

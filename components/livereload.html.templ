@@ -1,0 +1,10 @@
+package components
+
+
+templ Reloader(url string) {
+	<div hx-ext="sse" sse-connect={ url } hx-swap="outerHTML" sse-swap="livereload"></div>
+}
+
+templ Refresher() {
+	<script type="text/javascript">location.reload()</script>
+}

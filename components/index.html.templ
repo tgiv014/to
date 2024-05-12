@@ -4,12 +4,15 @@ import (
 	"github.com/tgiv014/to/domains/link"
 )
 
+var EnableLiveReload bool
+
 templ head() {
 	<head>
 		<meta charset="UTF-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<link href="/static/tailwind.css" rel="stylesheet"/>
 		<script src="/static/htmx.min.js"></script>
+		<script src="/static/sse.js"></script>
 	</head>
 }
 
@@ -35,6 +38,9 @@ templ Index(links []link.Link) {
 		@head()
 	</html>
 	<body class="bg-base-300" hx-boost="true">
+		if EnableLiveReload {
+			@Reloader("/should-reload")
+		}
 		<div class="flex items-center justify-center flex-col min-h-screen">
 			@create_link_card()
 			for _, link := range links {
