@@ -22,7 +22,7 @@ func (a *App) Router() *gin.Engine {
 
 	links := router.Group("links")
 	{
-		// links.GET("/", linkHandler.Get)
+		links.GET("/preview", linkHandler.Preview)
 		links.POST("/", linkHandler.Create)
 		links.DELETE("/:path", linkHandler.Delete)
 	}

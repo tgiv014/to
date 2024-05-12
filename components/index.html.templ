@@ -16,20 +16,53 @@ templ head() {
 	</head>
 }
 
-templ create_link_card() {
-	<div class="card w-96 bg-base-100 shadow-xl">
-		<div class="card-body">
-			<h2 class="card-title text-3xl">Create a Link</h2>
-			<div class="card-actions">
-				<form action="/links" method="post" class="w-full">
-					<div class="flex flex-col gap-2 w-full">
-						<input type="text" id="path" name="path" placeholder="Path" class="input input-bordered w-full"/>
-						<input type="text" id="url" name="url" placeholder="URL" class="input input-bordered w-full"/>
-						<button type="submit" class="btn btn-primary btn-block">Create Link</button>
-					</div>
-				</form>
+templ create_link_form() {
+	<form action="/links" method="post" class="w-full">
+		<div class="flex flex-col gap-4">
+			<div class="join w-full">
+				<input
+					type="text"
+					id="path"
+					name="path"
+					placeholder="Path"
+					class="join-item input input-bordered w-full"
+					hx-get="/links/preview"
+					hx-trigger="keyup changed delay:500ms"
+					hx-target="#preview"
+					hx-include="#url"
+				/>
+				<input
+					type="text"
+					id="url"
+					name="url"
+					placeholder="URL"
+					class="join-item input input-bordered w-full"
+					hx-get="/links/preview"
+					hx-trigger="keyup changed delay:500ms"
+					hx-target="#preview"
+					hx-include="#path"
+				/>
+				<button
+					type="submit"
+					class="join-item btn btn-primary"
+				>
+					Create Link
+				</button>
 			</div>
+			<div id="preview"></div>
 		</div>
+	</form>
+}
+
+templ ErrorMessage(s string) {
+	<div role="alert" class="alert alert-warning">
+		{ s }
+	</div>
+}
+
+templ PreviewMessage(s string) {
+	<div role="alert" class="alert alert-info">
+		{ s }
 	</div>
 }
 
@@ -42,21 +75,38 @@ templ Index(links []link.Link) {
 			@Reloader("/should-reload")
 		}
 		<div class="flex items-center justify-center flex-col min-h-screen">
-			@create_link_card()
-			for _, link := range links {
-				<div class="card w-96 bg-base-100 shadow-xl">
-					<div class="card-body">
-						<h3 class="card-title text-xl">{ link.Path } </h3>
-						<p><i>{ link.URL }</i></p>
-						<div class="card-actions">
-							<a href={ templ.URL(link.URL) } class="btn btn-primary">Go</a>
-							<form action={ templ.URL("/links/" + link.Path) } method="delete" class="inline">
-								<button type="submit" class="btn btn-secondary">Delete</button>
-							</form>
-						</div>
-					</div>
+			<div class="card w-fuill max-w-3xl bg-base-100 shadow-xl">
+				<div class="card-body">
+					<h2 class="card-title text-3xl">Links</h2>
+					@create_link_form()
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Path</th>
+								<th>URL</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							for _, link := range links {
+								<tr>
+									<th>{ link.Path }</th>
+									<th><a href={ templ.URL(link.URL) }>{ link.URL }</a></th>
+									<th class="inline-flex items-baseline justify-end w-full">
+										<button
+											hx-delete={ "/links/" + link.Path }
+											hx-target="closest tr"
+											class="btn btn-secondary"
+										>
+											Delete
+										</button>
+									</th>
+								</tr>
+							}
+						</tbody>
+					</table>
 				</div>
-			}
+			</div>
 		</div>
 	</body>
 }

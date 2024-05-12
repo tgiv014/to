@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/charmbracelet/log"
@@ -49,17 +50,7 @@ func (l *LinkHandler) Create(c *gin.Context) {
 	path := c.Request.FormValue("path")
 	url := c.Request.FormValue("url")
 
-	if path == "" {
-		c.String(http.StatusUnprocessableEntity, "path is required")
-		return
-	}
-
-	if url == "" {
-		c.String(http.StatusUnprocessableEntity, "url is required")
-		return
-	}
-
-	err := l.links.Create(&link.Link{
+	newLink, err := link.FromRequest(link.LinkRequest{
 		Path: path,
 		URL:  url,
 	})
@@ -68,7 +59,29 @@ func (l *LinkHandler) Create(c *gin.Context) {
 		return
 	}
 
+	err = l.links.Create(newLink)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
 	c.Redirect(http.StatusSeeOther, "/")
+}
+
+func (l *LinkHandler) Preview(c *gin.Context) {
+	path := c.Query("path")
+	url := c.Query("url")
+
+	newLink, err := link.FromRequest(link.LinkRequest{
+		Path: path,
+		URL:  url,
+	})
+	if err != nil {
+		components.ErrorMessage(err.Error()).Render(c, c.Writer)
+		return
+	}
+
+	components.PreviewMessage(fmt.Sprintf("%s will redirect to %s", newLink.Path, newLink.URL)).Render(c, c.Writer)
 }
 
 func (l *LinkHandler) Delete(c *gin.Context) {
@@ -86,5 +99,5 @@ func (l *LinkHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(http.StatusSeeOther, "/")
+	c.Status(http.StatusOK)
 }

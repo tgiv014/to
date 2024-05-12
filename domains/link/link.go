@@ -1,6 +1,12 @@
 package link
 
-import "gorm.io/gorm"
+import (
+	"errors"
+	"net/url"
+	"strings"
+
+	"gorm.io/gorm"
+)
 
 // Link represents a saved URL
 type Link struct {
@@ -43,4 +49,37 @@ func (s *Service) GetAll() ([]Link, error) {
 	var links []Link
 	err := s.DB.Find(&links).Error
 	return links, err
+}
+
+type LinkRequest struct {
+	Path string
+	URL  string
+}
+
+func FromRequest(req LinkRequest) (*Link, error) {
+	if req.Path == "" {
+		return nil, errors.New("path is required")
+	}
+
+	if strings.ContainsAny(req.Path, "/.,") {
+		return nil, errors.New("path cannot contain /, ., ,,")
+	}
+
+	if req.URL == "" {
+		return nil, errors.New("url is required")
+	}
+
+	u, err := url.Parse(req.URL)
+	if err != nil {
+		return nil, err
+	}
+
+	if u.Scheme == "" {
+		u.Scheme = "https"
+	}
+
+	return &Link{
+		Path: req.Path,
+		URL:  u.String(),
+	}, nil
 }
