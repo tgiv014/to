@@ -1,4 +1,4 @@
-name: Build and Test
+name: Tag Releases
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-and-test:
+  tag-releases:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -35,5 +35,5 @@ jobs:
       - name: Tag New Release
         uses: anothrNick/github-tag-action@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           WITH_V: true
