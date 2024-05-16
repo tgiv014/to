@@ -17,12 +17,15 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: "1.22"
-      
+
       - name: Install Task
         run: go install github.com/go-task/task/v3/cmd/task@latest
 
+      - name: Install Templ
+        run: go install github.com/a-h/templ/cmd/templ@latest
+
       - name: Build
         run: task build
-      
+
       - name: Test
         run: task test
