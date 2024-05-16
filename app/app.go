@@ -12,51 +12,54 @@ import (
 )
 
 type App struct {
-	cfg config.Config
+	Cfg config.Config
 
-	netProvider network.Provider
-	identifier  identity.Identifier
-	db          *gorm.DB
-	links       *link.Service
+	Net        network.Provider
+	Identifier identity.Identifier
+	DB         *gorm.DB
+	Links      *link.Service
 }
 
 func NewApp(cfg config.Config) *App {
-	return &App{
-		cfg: cfg,
+	a := &App{Cfg: cfg}
+	if a.Cfg.LocalPort != 0 {
+		provider := network.NewLocalProvider(a.Cfg.LocalPort)
+		a.Net = provider
+		a.Identifier = provider
+	} else {
+		ts := tailscale.NewService(a.Cfg.AuthKey, a.Cfg.DataPath)
+		a.Net = ts
+		a.Identifier = ts
 	}
+
+	if a.Cfg.LiveReload {
+		components.EnableLiveReload = true
+	}
+	return a
+}
+
+func (a *App) Setup() error {
+	db, err := gorm.Open(sqlite.Open(a.Cfg.DBPath), &gorm.Config{})
+	if err != nil {
+		return err
+	}
+	a.DB = db
+
+	err = a.DB.AutoMigrate(&link.Link{})
+	if err != nil {
+		return err
+	}
+
+	// Services
+	a.Links = link.NewService(a.DB)
+
+	return nil
 }
 
 func (a *App) Run() error {
-	if a.cfg.LocalPort != 0 {
-		provider := network.NewLocalProvider(a.cfg.LocalPort)
-		a.netProvider = provider
-		a.identifier = provider
-	} else {
-		ts := tailscale.NewService(a.cfg.AuthKey, a.cfg.DataPath)
-		a.netProvider = ts
-		a.identifier = ts
-	}
-
-	if a.cfg.LiveReload {
-		components.EnableLiveReload = true
-	}
-
-	ln, err := a.netProvider.Listen()
+	ln, err := a.Net.Listen()
 	if err != nil {
 		return err
 	}
-
-	db, err := gorm.Open(sqlite.Open(a.cfg.DBPath), &gorm.Config{})
-	if err != nil {
-		return err
-	}
-
-	// Persistence
-	a.db = db
-	a.db.AutoMigrate(&link.Link{})
-
-	// Services
-	a.links = link.NewService(a.db)
-
 	return a.Router().RunListener(ln)
 }

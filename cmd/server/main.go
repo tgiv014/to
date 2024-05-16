@@ -14,6 +14,12 @@ func main() {
 	}
 
 	a := app.NewApp(cfg)
+
+	err = a.Setup()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	err = a.Run()
 	if err != nil {
 		log.Fatal(err)

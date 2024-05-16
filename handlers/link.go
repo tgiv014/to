@@ -43,6 +43,12 @@ func (l *LinkHandler) Follow(c *gin.Context) {
 		return
 	}
 
+	err = l.links.Follow(link)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
 	c.Redirect(http.StatusSeeOther, link.URL)
 }
 
@@ -50,10 +56,7 @@ func (l *LinkHandler) Create(c *gin.Context) {
 	path := c.Request.FormValue("path")
 	url := c.Request.FormValue("url")
 
-	newLink, err := link.FromRequest(link.LinkRequest{
-		Path: path,
-		URL:  url,
-	})
+	newLink, err := link.New(path, url)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
@@ -72,10 +75,7 @@ func (l *LinkHandler) Preview(c *gin.Context) {
 	path := c.Query("path")
 	url := c.Query("url")
 
-	newLink, err := link.FromRequest(link.LinkRequest{
-		Path: path,
-		URL:  url,
-	})
+	newLink, err := link.New(path, url)
 	if err != nil {
 		components.ErrorMessage(err.Error()).Render(c, c.Writer)
 		return

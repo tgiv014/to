@@ -10,11 +10,11 @@ import (
 
 // Router returns a new gin router
 func (a *App) Router() *gin.Engine {
-	linkHandler := handlers.NewLinkHandler(a.links)
+	linkHandler := handlers.NewLinkHandler(a.Links)
 	reloadHandler := handlers.NewHotReloadHandler()
 
 	router := gin.Default()
-	router.Use(middleware.Identity(a.identifier))
+	router.Use(middleware.Identity(a.Identifier))
 	router.StaticFS("/static", static.EmbedFolder(assets.Assets, "dist"))
 	router.GET("/", linkHandler.Index)
 	router.GET("/:path", linkHandler.Follow)

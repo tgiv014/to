@@ -46,11 +46,15 @@ tasks:
       - CGO_ENABLED=0 go build -o to{{exeExt}} cmd/server/main.go
     sources:
       - "**/*.go"
-      - "assets/dist/tailwind.css"
       - "domains/config/default.yaml"
     generates:
       - "to{{exeExt}}"
-
+  test:
+    desc: Runs all tests
+    deps:
+      - generate
+    cmds:
+      - "go test ./..."
   dev:
     desc: Runs the to binary, rebuilding and restarting when sources are updated
     deps:
@@ -58,5 +62,6 @@ tasks:
     watch: true
     sources:
       - config.yaml
+      - "to{{exeExt}}"
     cmds:
       - "to{{exeExt}}"
